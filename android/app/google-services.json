@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "193241313035",
+    "project_id": "stepple-b5c1f",
+    "storage_bucket": "stepple-b5c1f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193241313035:android:c0da661731a3f0dc2f3c0e",
+        "android_client_info": {
+          "package_name": "com.anonymous.stepple"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "193241313035-i8jsc840aacqhlc7vc3f1qp2ek981faf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd-ugQpShByi8tlhjxEwcX6ioqLdP8rzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "193241313035-i8jsc840aacqhlc7vc3f1qp2ek981faf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

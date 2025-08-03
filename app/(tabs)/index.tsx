@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Button, Text, PermissionsAndroid } from 'react-native';
+import { StyleSheet, Button, Text, PermissionsAndroid, Linking } from 'react-native';
 import { View } from '@/components/Themed';
 import GoogleFit, { Scopes } from 'react-native-google-fit';
 
@@ -7,6 +7,7 @@ export default function TabOneScreen() {
   const [steps, setSteps] = useState<number | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [authCancelled, setAuthCancelled] = useState(false);
 
   const requestActivityPermission = async () => {
     const result = await PermissionsAndroid.request(
@@ -44,6 +45,11 @@ export default function TabOneScreen() {
           if (authResult.success) {
             setAuthorized(true);
             fetchSteps();
+            setAuthCancelled(false);
+          } else if (authResult.message === 'Authorization cancelled') {
+            console.warn('AUTH CANCELLED', authResult);
+            setErrorMessage('Install or open Google Fit, then retry authorization');
+            setAuthCancelled(true);
           } else {
             console.warn('AUTH FAIL', authResult);
             setErrorMessage(`Authorization failed: ${authResult.message}`);
@@ -84,37 +90,59 @@ export default function TabOneScreen() {
       <Text style={styles.stepCount}>{steps !== null ? steps : 'Loading...'}</Text>
       {errorMessage && <Text>{errorMessage}</Text>}
       {!authorized && (
-        <Button
-          title="Authorize Google Fit"
-          onPress={async () => {
-            const hasPermission = await requestActivityPermission();
-            if (!hasPermission) {
-              return;
-            }
-            const manualOptions = {
-              scopes: [
-                Scopes.FITNESS_ACTIVITY_READ,
-                Scopes.FITNESS_ACTIVITY_WRITE,
-                Scopes.FITNESS_LOCATION_READ,
-              ],
-            };
-            console.log('Manual authorize with options', manualOptions);
-            GoogleFit.authorize(manualOptions)
-              .then((authResult) => {
-                console.log('Manual authorize result', authResult);
-                if (authResult.success) {
-                  setAuthorized(true);
-                  fetchSteps();
-                } else {
-                  console.warn('AUTH FAIL', authResult);
-                  setErrorMessage(`Authorization failed: ${authResult.message}`);
-                }
-              })
-              .catch((error) => {
-                console.error('AUTH ERROR', error);
-              });
-          }}
-        />
+        <>
+          {authCancelled && (
+            <Button
+              title="Open Google Fit"
+              onPress={() =>
+                Linking.openURL(
+                  'market://details?id=com.google.android.apps.fitness',
+                )
+              }
+            />
+          )}
+          <Button
+            title={authCancelled ? 'Retry Authorization' : 'Authorize Google Fit'}
+            onPress={async () => {
+              const hasPermission = await requestActivityPermission();
+              if (!hasPermission) {
+                return;
+              }
+              const manualOptions = {
+                scopes: [
+                  Scopes.FITNESS_ACTIVITY_READ,
+                  Scopes.FITNESS_ACTIVITY_WRITE,
+                  Scopes.FITNESS_LOCATION_READ,
+                ],
+              };
+              console.log('Manual authorize with options', manualOptions);
+              GoogleFit.authorize(manualOptions)
+                .then((authResult) => {
+                  console.log('Manual authorize result', authResult);
+                  if (authResult.success) {
+                    setAuthorized(true);
+                    fetchSteps();
+                    setAuthCancelled(false);
+                  } else if (authResult.message === 'Authorization cancelled') {
+                    console.warn('AUTH CANCELLED', authResult);
+                    setErrorMessage(
+                      'Install or open Google Fit, then retry authorization',
+                    );
+                    setAuthCancelled(true);
+                  } else {
+                    console.warn('AUTH FAIL', authResult);
+                    setErrorMessage(
+                      `Authorization failed: ${authResult.message}`,
+                    );
+                    setAuthCancelled(false);
+                  }
+                })
+                .catch((error) => {
+                  console.error('AUTH ERROR', error);
+                });
+            }}
+          />
+        </>
       )}
     </View>
   );

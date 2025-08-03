@@ -1,37 +1,58 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Button, Text } from 'react-native';
+import { StyleSheet, Button, Text, PermissionsAndroid } from 'react-native';
 import { View } from '@/components/Themed';
 import GoogleFit, { Scopes } from 'react-native-google-fit';
 
 export default function TabOneScreen() {
   const [steps, setSteps] = useState<number | null>(null);
   const [authorized, setAuthorized] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const requestActivityPermission = async () => {
+    const result = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
+    );
+
+    if (result !== PermissionsAndroid.RESULTS.GRANTED) {
+      setErrorMessage('Activity recognition permission denied');
+      return false;
+    }
+
+    setErrorMessage(null);
+    return true;
+  };
 
   useEffect(() => {
-    const options = {
-      scopes: [Scopes.FITNESS_ACTIVITY_READ],
-    };
+    const init = async () => {
+      const hasPermission = await requestActivityPermission();
+      if (!hasPermission) {
+        return;
+      }
 
-    GoogleFit.checkIsAuthorized()
-      .then((isAuthorized) => {
+      const options = {
+        scopes: [Scopes.FITNESS_ACTIVITY_READ],
+      };
+
+      try {
+        const isAuthorized = await GoogleFit.checkIsAuthorized();
         if (!isAuthorized) {
-          return GoogleFit.authorize(options)
-            .then((authResult) => {
-              if (authResult.success) {
-                setAuthorized(true);
-                fetchSteps();
-              } else {
-                console.warn('AUTH FAIL', authResult);
-              }
-            });
+          const authResult = await GoogleFit.authorize(options);
+          if (authResult.success) {
+            setAuthorized(true);
+            fetchSteps();
+          } else {
+            console.warn('AUTH FAIL', authResult);
+          }
         } else {
           setAuthorized(true);
           fetchSteps();
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('AUTH CHECK ERROR', err);
-      });
+      }
+    };
+
+    init();
   }, []);
 
   const fetchSteps = () => {
@@ -56,10 +77,15 @@ export default function TabOneScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Steps Today</Text>
       <Text style={styles.stepCount}>{steps !== null ? steps : 'Loading...'}</Text>
+      {errorMessage && <Text>{errorMessage}</Text>}
       {!authorized && (
         <Button
           title="Authorize Google Fit"
-          onPress={() => {
+          onPress={async () => {
+            const hasPermission = await requestActivityPermission();
+            if (!hasPermission) {
+              return;
+            }
             GoogleFit.authorize({
               scopes: [
                 Scopes.FITNESS_ACTIVITY_READ,

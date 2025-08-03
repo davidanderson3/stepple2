@@ -33,8 +33,9 @@
             { "scheme": "stepple", "host": "expo-development-client" }
           ]
         }
-      ]
-    },
+        ],
+        "permissions": ["ACTIVITY_RECOGNITION"]
+      },
     "web": {
       "bundler": "metro",
       "output": "static",

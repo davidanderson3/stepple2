@@ -8,6 +8,14 @@ export default function TabOneScreen() {
   const [authorized, setAuthorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const authOptions = {
+    scopes: [
+      Scopes.FITNESS_ACTIVITY_READ,
+      Scopes.FITNESS_ACTIVITY_WRITE,
+      Scopes.FITNESS_LOCATION_READ,
+    ],
+  };
+
   const requestActivityPermission = async () => {
     const result = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
@@ -30,27 +38,24 @@ export default function TabOneScreen() {
         return;
       }
 
-      const options = {
-        scopes: [Scopes.FITNESS_ACTIVITY_READ],
-      };
-      console.log('Google Fit authorization options', options);
+      console.log('Google Fit authorization options', authOptions);
 
       try {
         await GoogleFit.checkIsAuthorized();
         console.log('checkIsAuthorized ->', GoogleFit.isAuthorized);
         if (!GoogleFit.isAuthorized) {
-          const authResult = await GoogleFit.authorize(options);
+          const authResult = await GoogleFit.authorize(authOptions);
           console.log('authorize() result', authResult);
           if (authResult.success) {
             setAuthorized(true);
-            fetchSteps();
+            await fetchSteps();
           } else {
             console.warn('AUTH FAIL', authResult);
             setErrorMessage(`Authorization failed: ${authResult.message}`);
           }
         } else {
           setAuthorized(true);
-          fetchSteps();
+          await fetchSteps();
         }
       } catch (err) {
         console.error('AUTH CHECK ERROR', err);
@@ -60,22 +65,21 @@ export default function TabOneScreen() {
     init();
   }, []);
 
-  const fetchSteps = () => {
+  const fetchSteps = async () => {
     const today = new Date();
     const options = {
       startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString(),
       endDate: today.toISOString(),
     };
 
-    GoogleFit.getDailyStepCountSamples(options)
-      .then((results) => {
-        const stepsToday =
-          results.find((r) => r.source === 'com.google.android.gms.fit')?.steps?.[0]?.value || 0;
-        setSteps(stepsToday);
-      })
-      .catch((err) => {
-        console.error('STEPS ERROR', err);
-      });
+    try {
+      const results = await GoogleFit.getDailyStepCountSamples(options);
+      const stepsToday =
+        results.find((r) => r.source === 'com.google.android.gms.fit')?.steps?.[0]?.value || 0;
+      setSteps(stepsToday);
+    } catch (err) {
+      console.error('STEPS ERROR', err);
+    }
   };
 
   return (
@@ -91,28 +95,20 @@ export default function TabOneScreen() {
             if (!hasPermission) {
               return;
             }
-            const manualOptions = {
-              scopes: [
-                Scopes.FITNESS_ACTIVITY_READ,
-                Scopes.FITNESS_ACTIVITY_WRITE,
-                Scopes.FITNESS_LOCATION_READ,
-              ],
-            };
-            console.log('Manual authorize with options', manualOptions);
-            GoogleFit.authorize(manualOptions)
-              .then((authResult) => {
-                console.log('Manual authorize result', authResult);
-                if (authResult.success) {
-                  setAuthorized(true);
-                  fetchSteps();
-                } else {
-                  console.warn('AUTH FAIL', authResult);
-                  setErrorMessage(`Authorization failed: ${authResult.message}`);
-                }
-              })
-              .catch((error) => {
-                console.error('AUTH ERROR', error);
-              });
+            console.log('Manual authorize with options', authOptions);
+            try {
+              const authResult = await GoogleFit.authorize(authOptions);
+              console.log('Manual authorize result', authResult);
+              if (authResult.success) {
+                setAuthorized(true);
+                await fetchSteps();
+              } else {
+                console.warn('AUTH FAIL', authResult);
+                setErrorMessage(`Authorization failed: ${authResult.message}`);
+              }
+            } catch (error) {
+              console.error('AUTH ERROR', error);
+            }
           }}
         />
       )}

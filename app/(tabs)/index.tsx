@@ -12,6 +12,7 @@ export default function TabOneScreen() {
     const result = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
     );
+    console.log('ACTIVITY_RECOGNITION permission result', result);
 
     if (result !== PermissionsAndroid.RESULTS.GRANTED) {
       setErrorMessage('Activity recognition permission denied');
@@ -32,16 +33,20 @@ export default function TabOneScreen() {
       const options = {
         scopes: [Scopes.FITNESS_ACTIVITY_READ],
       };
+      console.log('Google Fit authorization options', options);
 
       try {
         const isAuthorized = await GoogleFit.checkIsAuthorized();
+        console.log('checkIsAuthorized ->', isAuthorized);
         if (!isAuthorized) {
           const authResult = await GoogleFit.authorize(options);
+          console.log('authorize() result', authResult);
           if (authResult.success) {
             setAuthorized(true);
             fetchSteps();
           } else {
             console.warn('AUTH FAIL', authResult);
+            setErrorMessage(`Authorization failed: ${authResult.message}`);
           }
         } else {
           setAuthorized(true);
@@ -86,19 +91,23 @@ export default function TabOneScreen() {
             if (!hasPermission) {
               return;
             }
-            GoogleFit.authorize({
+            const manualOptions = {
               scopes: [
                 Scopes.FITNESS_ACTIVITY_READ,
                 Scopes.FITNESS_ACTIVITY_WRITE,
                 Scopes.FITNESS_LOCATION_READ,
               ],
-            })
+            };
+            console.log('Manual authorize with options', manualOptions);
+            GoogleFit.authorize(manualOptions)
               .then((authResult) => {
+                console.log('Manual authorize result', authResult);
                 if (authResult.success) {
                   setAuthorized(true);
                   fetchSteps();
                 } else {
                   console.warn('AUTH FAIL', authResult);
+                  setErrorMessage(`Authorization failed: ${authResult.message}`);
                 }
               })
               .catch((error) => {

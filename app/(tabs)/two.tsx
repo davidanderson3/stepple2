@@ -1,14 +1,20 @@
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 export default function TabTwoScreen() {
+  const investmentReturnRate = 0; // Placeholder value
+  const savingsReturnRate = 0; // Placeholder value
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Text style={styles.category}>Investment Accounts</Text>
+      <Text style={styles.rate}>Investment Return Rate: {investmentReturnRate}%</Text>
+
+      <Text style={[styles.category, styles.sectionSpacing]}>Savings</Text>
+      <Text style={styles.rate}>
+        Savings Account Return Rate: {savingsReturnRate}%
+      </Text>
     </View>
   );
 }
@@ -18,14 +24,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
-  title: {
+  category: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  sectionSpacing: {
+    marginTop: 24,
+  },
+  rate: {
+    fontSize: 16,
   },
 });

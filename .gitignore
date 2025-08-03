@@ -35,12 +35,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-android/app/src/main/AndroidManifest.xml
-android/app/src/main/AndroidManifest.xml
 ios/Podfile.lock
 ios/stepple/PrivacyInfo.xcprivacy
 ios/stepple.xcodeproj/project.pbxproj
 ios/stepple.xcworkspace/contents.xcworkspacedata
 ios/stepple.xcodeproj/project.pbxproj
-android/app/src/main/AndroidManifest.xml
-android/app/src/main/AndroidManifest.xml

@@ -36,9 +36,9 @@ export default function TabOneScreen() {
       console.log('Google Fit authorization options', options);
 
       try {
-        const isAuthorized = await GoogleFit.checkIsAuthorized();
-        console.log('checkIsAuthorized ->', isAuthorized);
-        if (!isAuthorized) {
+        await GoogleFit.checkIsAuthorized();
+        console.log('checkIsAuthorized ->', GoogleFit.isAuthorized);
+        if (!GoogleFit.isAuthorized) {
           const authResult = await GoogleFit.authorize(options);
           console.log('authorize() result', authResult);
           if (authResult.success) {

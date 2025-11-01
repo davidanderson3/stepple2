@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
@@ -6,25 +8,25 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath('com.android.tools.build:gradle')
+    classpath('com.android.tools.build:gradle:8.11.1')
     classpath('com.facebook.react:react-native-gradle-plugin')
-    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21')
   }
 }
 
 def reactNativeAndroidDir = new File(
   providers.exec {
     workingDir(rootDir)
-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
+    commandLine('node', '--print', "require.resolve('react-native/package.json')")
   }.standardOutput.asText.get().trim(),
-  "../android"
+  '../android'
 )
 
 allprojects {
   repositories {
     maven {
       // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-      url(reactNativeAndroidDir)
+      url reactNativeAndroidDir
     }
 
     google()
@@ -33,5 +35,13 @@ allprojects {
   }
 }
 
-apply plugin: "expo-root-project"
-apply plugin: "com.facebook.react.rootproject"
+subprojects { subproject ->
+  tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+      jvmTarget = (rootProject.findProperty('kotlin.compiler.jvmTarget') ?: '17') as String
+    }
+  }
+}
+
+apply plugin: 'expo-root-project'
+apply plugin: 'com.facebook.react.rootproject'

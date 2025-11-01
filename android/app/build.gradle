@@ -81,6 +81,11 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def releaseStoreFile = System.getenv("STEPPLE_RELEASE_STORE_FILE") ?: project.findProperty("STEPPLE_RELEASE_STORE_FILE")
+def releaseStorePassword = System.getenv("STEPPLE_RELEASE_STORE_PASSWORD") ?: project.findProperty("STEPPLE_RELEASE_STORE_PASSWORD")
+def releaseKeyAlias = System.getenv("STEPPLE_RELEASE_KEY_ALIAS") ?: project.findProperty("STEPPLE_RELEASE_KEY_ALIAS")
+def releaseKeyPassword = System.getenv("STEPPLE_RELEASE_KEY_PASSWORD") ?: project.findProperty("STEPPLE_RELEASE_KEY_PASSWORD")
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -102,17 +107,21 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile releaseStoreFile ? file(releaseStoreFile) : null
+            storePassword releaseStorePassword
+            keyAlias releaseKeyAlias
+            keyPassword releaseKeyPassword
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
-            minifyEnabled enableProguardInReleaseBuilds
+            signingConfig signingConfigs.release
+            shrinkResources false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             crunchPngs (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
         }
@@ -150,6 +159,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation "androidx.health.connect:connect-client:1.1.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

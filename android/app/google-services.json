@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "193241313035-qagrdvls2e65tlpllqo8aop7js7tmls6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.stepple",
+            "certificate_hash": "01e015b6da64f8abeff5de1fa2565ad76e197018"
+          }
+        },
+        {
           "client_id": "193241313035-i8jsc840aacqhlc7vc3f1qp2ek981faf.apps.googleusercontent.com",
           "client_type": 3
         }

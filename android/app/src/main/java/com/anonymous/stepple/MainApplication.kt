@@ -25,6 +25,7 @@ class MainApplication : Application(), ReactApplication {
             val packages = PackageList(this).packages
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(MyReactNativePackage())
+            packages.add(HealthConnectPackage())
             return packages
           }
 
@@ -47,7 +48,15 @@ class MainApplication : Application(), ReactApplication {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       load()
     }
-    ApplicationLifecycleDispatcher.onApplicationCreate(this)
+    try {
+      ApplicationLifecycleDispatcher.onApplicationCreate(this)
+    } catch (e: IllegalStateException) {
+      val alreadyInitializedMessage = "DevelopmentClientController was initialized."
+      if (!BuildConfig.DEBUG || e.message?.contains(alreadyInitializedMessage) != true) {
+        throw e
+      }
+      // Dev Launcher already set up in this process; ignore the duplicate callback.
+    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

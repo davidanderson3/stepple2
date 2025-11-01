@@ -41,3 +41,6 @@ ios/stepple/PrivacyInfo.xcprivacy
 ios/stepple.xcodeproj/project.pbxproj
 ios/stepple.xcworkspace/contents.xcworkspacedata
 ios/stepple.xcodeproj/project.pbxproj
+stepple-release.keystore
+android/app/debug.keystore
+firebaseConfig.ts

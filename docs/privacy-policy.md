@@ -1,3 +1,7 @@
+---
+layout: none
+---
+
 # Stepple Privacy Policy
 
 _Last updated: October 2024_

@@ -248,6 +248,15 @@ export default function TabTwoScreen() {
           <Button title="Install / Update Health Connect" onPress={openHealthConnectInPlayStore} />
         )}
       </View>
+      {__DEV__ && (
+        <View style={styles.card}>
+          <Text style={styles.label}>Screenshots</Text>
+          <Button
+            title="Open Mock Leaderboard"
+            onPress={() => Linking.openURL('stepple://mock-leaderboard')}
+          />
+        </View>
+      )}
     </View>
   );
 }

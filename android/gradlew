@@ -64,6 +64,10 @@
 #
 ##############################################################################
 
+if [ -z "$JAVA_HOME" ] && [ -d "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" ]; then
+  JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"
+fi
+
 # Attempt to set APP_HOME
 
 # Resolve links: $0 may be a link

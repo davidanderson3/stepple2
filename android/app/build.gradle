@@ -97,8 +97,8 @@ android {
         applicationId 'com.anonymous.stepple'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 3
+        versionName "1.0.2"
     }
     signingConfigs {
         debug {
@@ -117,7 +117,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            resValue "string", "app_name", "Stepple"
         }
+
         release {
             signingConfig signingConfigs.release
             shrinkResources false
